@@ -40,6 +40,7 @@ class Config:
     max_tokens: int = 1400
     token_budget: int = 150000
     requests_per_minute: int = 20
+    prefer_offline: bool = True
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -66,6 +67,7 @@ class Config:
             max_tokens=integer("CASE4_MAX_TOKENS", cls.max_tokens),
             token_budget=integer("CASE4_TOKEN_BUDGET", cls.token_budget),
             requests_per_minute=integer("CASE4_RPM", cls.requests_per_minute),
+            prefer_offline=os.environ.get("CASE4_USE_LLM", "0") != "1",
         )
 
     @property
@@ -507,7 +509,7 @@ DOSE = re.compile(
     r"(?:(?:сколько|как(?:ая|ую|ие|ой)|подбери|подберите|назови|назовите|рассчитай|скажи)\s+"
     r"[^.!?]{0,40}(?:доз|капел|капл|мг|мкг|миллиграм|микрограм|таблет|капсул|единиц))"
     r"|(?:(?:доз|капл|мг|мкг|миллиграм|микрограм)\w*[^.!?]{0,30}(?:приним|пить|выпить|выпит|капнуть|нужно|можно|безопасн))"
-    r"|(?:сколько\s+[^.!?]{0,30}(?:принимать|принять|выпить|выпит|капать|капнуть|давать|капел|капл))"
+    r"|(?:сколько\s+[^.!?]{0,30}(?:принимать|принять|выпить|выпит|пить|пью|пьёшь|капать|капнуть|давать|капел|капл))"
     r"|(?:(?:схем|курс)\w*\s+(?:прием|приёма|применени))",
     re.I,
 )
@@ -530,7 +532,10 @@ DIAGNOSIS = re.compile(
     r"[^.!?]{0,25}(?:или|либо)[^.!?]{0,30}"
     r"(?:апноэ|бессонниц\w*|депресси\w*|синдром\w*|расстройств\w*|парасомни\w*|нарколепси\w*)"
     r"|(?:это|это\s+у\s+меня)\s+(?:не\s+)?(?:апноэ|бессонниц|депресси|синдром)"
-    r"|(?:есть|есть\s+ли)\s+у\s+меня\s+[^.!?]{0,30}(?:апноэ|бессонниц|депресси|синдром)",
+    r"|(?:есть|есть\s+ли)\s+у\s+меня\s+[^.!?]{0,30}(?:апноэ|бессонниц|депресси|синдром)"
+    r"|на\s+что\s+(?:это\s+)?похоже|что\s+это\s+может\s+быть|это\s+норма\s+или\s+"
+    r"(?:болезнь|патологи|нарушени|расстройств)|(?:это|у\s+меня)\s+(?:уже\s+)?"
+    r"(?:болезнь|патологи|расстройств\w*|нарушени\w*)\s+сна",
     re.I,
 )
 OUT_OF_BASE = re.compile(
@@ -547,7 +552,9 @@ OUT_OF_BASE_INTENT = re.compile(
 ROLEPLAY = re.compile(
     r"(?:ты\s+не\s+эксперт|ты\s+(?:теперь|больше)\s+не|давай\s+(?:сыграем|представ\w*)|"
     r"представ\w*,?\s+что\s+ты|сыграй\s+роль|вообрази,?\s+что\s+ты|"
-    r"act\s+as|roleplay|you\s+are\s+no\s+longer|pretend\s+(?:to\s+be|you\s+are))",
+    r"act\s+as|roleplay|you\s+are\s+no\s+longer|pretend\s+(?:to\s+be|you\s+are)|"
+    r"ты\s+мой\s+(?:приятель|приятельниц\w*|друг|подруг\w*|знаком\w*|врач|фармацевт|доктор)|"
+    r"(?:как|будучи)\s+(?:приятель|друг|подруг\w*|врач|фармацевт|доктор))",
     re.I,
 )
 INJECTION_INPUT = re.compile(
@@ -911,6 +918,7 @@ def parse_json_object(content: str) -> dict[str, Any] | None:
 def sanitize(text: str, experts: list[Expert]) -> str:
     text = EMOJI.sub("", text or "")
     for expert in experts:
+        text = re.sub(rf"\b{re.escape(expert.key)}\b\s*[:—–-]?\s*", " ", text)
         text = text.replace(expert.expert_id, "")
     text = re.sub(r"\s+", " ", text).strip()
     text = re.sub(
@@ -1015,7 +1023,7 @@ class Service:
 
         async def one(records: list[Record]) -> dict[str, dict[str, Any]]:
             try:
-                if self.gateway.dead:
+                if self.gateway.dead or self.config.prefer_offline:
                     risk = assess(records[0].text)
                     experts = []
                     for record in records:
@@ -1060,7 +1068,7 @@ class Service:
                 item["text"] for item in dataset.history.get(first.user_id, [])[-3:] if item["role"] == "user"
             )
             query = f"{query} {context}"
-        if self.gateway.dead:
+        if self.gateway.dead or self.config.prefer_offline:
             return self.offline(dataset, records, experts, risk)
         selected = await self.select_articles(dataset, first, index, risk, deadline)
         entries, mapping = evidence_entries(selected)
