@@ -982,19 +982,32 @@ class Service:
 
     async def fetch(self, dataset_code: str, authorization: str) -> Dataset:
         url = f"{self.config.hack_api_url}/case/4/getData"
-        try:
-            response = await self.client.get(
-                url,
-                params={"dataset_code": dataset_code},
-                headers={"Authorization": authorization},
-                timeout=self.config.fetch_seconds,
-            )
-        except httpx.HTTPError as exc:
-            raise ContractError("dataset_unavailable") from exc
-        if response.status_code == 401:
-            raise ContractError("dataset_unauthorized")
-        if response.status_code != 200:
+        response: httpx.Response | None = None
+        for attempt in range(3):
+            try:
+                candidate = await self.client.get(
+                    url,
+                    params={"dataset_code": dataset_code},
+                    headers={"Authorization": authorization},
+                    timeout=self.config.fetch_seconds,
+                )
+            except httpx.HTTPError:
+                if attempt >= 2:
+                    raise ContractError("dataset_unavailable")
+                await asyncio.sleep(3 if attempt == 0 else 10)
+                continue
+            if candidate.status_code == 401:
+                raise ContractError("dataset_unauthorized")
+            if candidate.status_code == 200:
+                response = candidate
+                break
+            if candidate.status_code == 429 or candidate.status_code >= 500:
+                if attempt < 2:
+                    await asyncio.sleep(3 if attempt == 0 else 10)
+                    continue
             raise ContractError("dataset_upstream_error")
+        if response is None:
+            raise ContractError("dataset_unavailable")
         try:
             payload = response.json()
         except ValueError as exc:
