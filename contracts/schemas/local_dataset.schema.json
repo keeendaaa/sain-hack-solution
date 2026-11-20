@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synthetic local dataset, NOT the official Case4Dataset schema",
+  "type": "object",
+  "required": ["meta", "articles", "experts", "requests"],
+  "properties": {
+    "meta": {"type": "object", "required": ["dataset_id"]},
+    "articles": {"type": "array", "minItems": 1},
+    "experts": {"type": "array", "minItems": 1, "maxItems": 3},
+    "requests": {"type": "array"}
+  }
+}

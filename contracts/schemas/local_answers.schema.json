@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synthetic local answers, NOT the official Case4Answers schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["dataset_id", "answers"],
+  "properties": {
+    "dataset_id": {"type": ["string", "integer"]},
+    "answers": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "expert_id", "text", "refused", "references"],
+      "properties": {
+        "request_id": {"type": ["string", "integer"]},
+        "expert_id": {"type": ["string", "integer"]},
+        "text": {"type": "string", "minLength": 12},
+        "refused": {"type": "boolean"},
+        "references": {"type": "array", "minItems": 1, "maxItems": 2, "items": {
+          "type": "object", "additionalProperties": false,
+          "required": ["article_id", "section_id"],
+          "properties": {"article_id": {"type": ["string", "integer"]}, "section_id": {"type": ["string", "integer"]}}
+        }}
+      }
+    }}
+  }
+}

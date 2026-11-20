@@ -1,0 +1,30 @@
+{
+  "dataset": {
+    "meta": {"dataset_id": "synthetic-case4-demo", "synthetic": true},
+    "articles": [
+      {"article_id": "demo-overview", "title": "Синтетический обзор: термины сна", "sections": [
+        {"section_id": "intro", "heading": "Общие понятия", "text": "Циркадный ритм — термин для описания суточной организации процессов. Это синтетический учебный текст для проверки программы, а не научная статья или персональная рекомендация."}
+      ]},
+      {"article_id": "demo-shifts", "title": "Синтетический текст: shift work и ночные смены", "sections": [
+        {"section_id": "intro", "heading": "Сменный график и контекст", "text": "В этом учебном тексте ночные смены связаны с терминами shift work, daytime sleep и circadian rhythm. Пример нужен, чтобы проверить поиск бытовой формулировки по научным терминам. Из этого примера нельзя делать выводы о лечении."}
+      ]},
+      {"article_id": "demo-chemistry", "title": "Синтетический текст: обсуждение мелатонина", "sections": [
+        {"section_id": "mechanism", "heading": "Граница информационного ответа", "text": "В этом синтетическом разделе слово мелатонин используется как предмет информационного вопроса. Название вещества не означает просьбу о личном назначении. Раздел не содержит рекомендаций о приёме вещества."}
+      ]}
+    ],
+    "experts": [
+      {"expert_id": "clinician", "role": "Сомнолог-клиницист", "style": "Спокойно объясняет наблюдения, ограничения и основания. Не ставит диагноз и не назначает лечение."},
+      {"expert_id": "experimenter", "role": "Биохакер-экспериментатор", "style": "Различает предположение и проверяемый вывод, объясняет через наблюдение. Не предлагает лекарства или дозы."},
+      {"expert_id": "nutritionist", "role": "Нутрициолог здравого смысла", "style": "Говорит простыми словами, связывает объяснение с повседневным контекстом без выдуманных советов о питании."}
+    ],
+    "requests": [
+      {"request_id": "q1-c", "user_id": "demo-user", "expert_id": "clinician", "text": "Что такое циркадный ритм?"},
+      {"request_id": "q2-e", "user_id": "demo-user", "expert_id": "experimenter", "text": "Сколько мелатонина мне принимать?"},
+      {"request_id": "q1-n", "user_id": "demo-user", "expert_id": "nutritionist", "text": "Что такое циркадный ритм?"},
+      {"request_id": "q1-e", "user_id": "demo-user", "expert_id": "experimenter", "text": "Что такое циркадный ритм?"},
+      {"request_id": "q2-c", "user_id": "demo-user", "expert_id": "clinician", "text": "Сколько мелатонина мне принимать?"},
+      {"request_id": "q2-n", "user_id": "demo-user", "expert_id": "nutritionist", "text": "Сколько мелатонина мне принимать?"}
+    ]
+  },
+  "reference": {"DO_NOT_PASS_TO_PRODUCTION": true}
+}

@@ -1,0 +1,9 @@
+{
+  "name": "synthetic-local-example-v1-not-official",
+  "verified_official": false,
+  "dataset_schema": "../schemas/local_dataset.schema.json",
+  "answers_schema": "../schemas/local_answers.schema.json",
+  "request_context": "/context",
+  "output_expert_id": "/expert_id",
+  "output_dataset_id": "/dataset_id"
+}

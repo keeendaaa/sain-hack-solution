@@ -1,0 +1,16 @@
+[
+  ["сон", "sleep"],
+  ["ночная смена", "сменная работа", "сменный график", "shift work", "night shift"],
+  ["циркадный ритм", "биологические часы", "circadian rhythm", "circadian"],
+  ["не могу заснуть", "засыпание", "sleep onset", "sleep latency"],
+  ["недосып", "недостаток сна", "sleep deprivation", "insufficient sleep"],
+  ["кофе", "кофеин", "caffeine", "coffee"],
+  ["мелатонин", "melatonin"],
+  ["пробуждение", "просыпаюсь", "awakening", "wakefulness"],
+  ["дневной сон", "nap", "napping", "daytime sleep"],
+  ["свет", "освещение", "light", "lighting"],
+  ["храп", "snoring"],
+  ["бессонница", "insomnia"],
+  ["экран", "телефон", "screen", "smartphone"],
+  ["физическая активность", "тренировка", "exercise", "physical activity"]
+]
